@@ -1,3 +1,7 @@
 .vs
 x64
 Ninja
+build
+.vscode
+out
+src/main.exe
