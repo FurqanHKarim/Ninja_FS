@@ -25,8 +25,8 @@ private:
 
 public:
     bool OpenDevice(string dev_name);
-    bool Write_on_device(char* note,int byte_offset,size_t size);
-    bool Read_from_device(char* note,int byte_offset,size_t size);
+    bool Write_on_device(char* note,size_t byte_offset,size_t size);
+    bool Read_from_device(char* note,size_t byte_offset,size_t size);
     bool Close_device();
 
 };
