@@ -2,9 +2,8 @@
 
 
 
-
 bool Access::OpenDevice(string dev_name) {
-
+    dev_name.insert(0,"\\\\.\\");
     //////////OPENING Device in first instance
     Disk_101 = CreateFileA(
         inter.c_str(),                        //[in]           LPCSTR   lpFileName,
@@ -22,27 +21,26 @@ bool Access::OpenDevice(string dev_name) {
     }
 
     ///Extracting Physical Device No////////
-    u_Good = DeviceIoControl(
-        Disk_101,                     // handle to device
-        IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, // dwIoControlCode
-        NULL,                                 // lpInBuffer
-        0,                                    // nInBufferSize
-        &hello,                 // output buffer
-        sizeof(hello),               // size of output buffer
-        &status,            // number of bytes returned
-        NULL           // OVERLAPPED structure
-    );
-
-    if (!u_Good)
+    if (!DeviceIoControl(Disk_101,                     // handle to device
+        IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS,          // dwIoControlCode
+        NULL,                                          // lpInBuffer
+        0,                                             // nInBufferSize
+        &hello,                                        // output buffer
+        sizeof(hello),                                 // size of output buffer
+        &status,                                       // number of bytes returned
+        NULL                                           // OVERLAPPED structure   
+        ))
         cout << "Device Credentials not extracted: Error" << GetLastError() << endl;
-     
+
+    inter = "\\\\.\\PhysicalDrive";
+    inter.append(to_string(hello.Extents[0].DiskNumber));
+
+
     /////////////////closing that instance of the data device
     if (!CloseHandle(Disk_101))
         cout << "Handle not closed: Error" << GetLastError() << endl;
     
-    inter = "\\\\.\\PhysicalDrive";
-    inter.append(to_string(hello.Extents[0].DiskNumber));
-
+    
     /////////////////Reopening the instance of the device using its physical address no
     Disk_101 = CreateFileA(inter.c_str(),                              // Drive to open
         GENERIC_READ | GENERIC_WRITE,          // Access to the drive
@@ -51,32 +49,90 @@ bool Access::OpenDevice(string dev_name) {
         OPEN_EXISTING,                         // Disposition
         0,                                     // no file attributes
         NULL);
-
     if (Disk_101 == INVALID_HANDLE_VALUE) {
         cout << "File not created. Error Code: " << GetLastError() << endl;
-        return(-1);
+        return(1);
     }
+
     /////////////////Locking the device from other processes
-    u_Good = DeviceIoControl(Disk_101, FSCTL_LOCK_VOLUME,
-        NULL, 0, NULL, 0, &status, NULL);
-    if (!u_Good) {
+    if (!DeviceIoControl(Disk_101, 
+        FSCTL_LOCK_VOLUME,
+        NULL, 0, NULL, 0, &status, NULL))
+        {
         printf("Failed to lock volume (err = %d).\n", GetLastError());
         return(1);
     }
 
 
     /////////////////Dismounting the drive 
-    u_Good = DeviceIoControl(Disk_101, FSCTL_DISMOUNT_VOLUME,
-        NULL, 0, NULL, 0, &status, NULL);
-    if (!u_Good) {
+    if (!DeviceIoControl(Disk_101,
+        FSCTL_DISMOUNT_VOLUME,
+        NULL, 0, NULL, 0, &status, NULL)) 
+        {
         printf("Failed to dismount volume (err = %d).\n", GetLastError());
         return(1);
     }
 
     return 0;
- 
+
+}
+
+bool Access:: Write_on_device(char* note,int where,int size){
+
+    //////Setting the pointer to where to write the file
+    error_code = SetFilePointer(Disk_101, (where), 0, FILE_BEGIN);
+    if (error_code == INVALID_SET_FILE_POINTER)
+    {
+        std::cerr << "Error: failed to seek to the beginning of the disk device" << GetLastError() <<std::endl;
+        CloseHandle(Disk_101);
+        return 1;
+    }
+
+    int meh =sizeof(*note);
+    meh =sizeof(note);
+
+    ///////Actually writing the file
+    if (!WriteFile(Disk_101, note, size, &status, NULL))
+    {
+        std::cerr << "Error: failed to write data to disk device" <<  GetLastError() << std::endl;
+        CloseHandle(Disk_101);
+        error_code = GetLastError();
+        return 1;
+    }
+    std::cout << "Data was successfully written to disk device"<< std::endl;
+    return 0;
+
+}
 
 
+bool Access:: Read_from_device(char* note,int where,int size){
+    // Read the data back from the disk device
 
+    error_code = SetFilePointer(Disk_101, where, 0, FILE_BEGIN);
+    if (error_code == INVALID_SET_FILE_POINTER)
+    {
+        std::cerr << "Error: failed to seek to the beginning of the disk device" << std::endl;
+        CloseHandle(Disk_101);
+        return 1;
+    }
+
+
+    if (!ReadFile(Disk_101, note, size, &status, NULL))
+    {
+        error_code = GetLastError();
+        std::cerr << "Failed to read file on USB drive. Error code: " << error_code << std::endl;
+
+        std::cerr << "Error: failed to read data from disk device" << std::endl;
+        CloseHandle(Disk_101);
+        return 1;
+    }
+    return 0;
+}
+
+
+bool Access:: Close_device(){
+    // Close the disk device
+    CloseHandle(Disk_101);
+    return 0;
 
 }

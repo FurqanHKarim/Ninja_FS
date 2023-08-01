@@ -26,3 +26,11 @@ uint64_t get_time() {
 	auto in_time_t = std::chrono::system_clock::to_time_t(hello);
 	return hello.time_since_epoch().count();
 }
+
+void print_everything(char* arr,int size){
+	for (int  i = 0; i < sizeof(arr); i++)
+	{
+		cout<<arr[i];
+	}
+	cout<<endl;
+}

@@ -7,7 +7,7 @@
 
 void print_time(uint64_t);
 uint64_t get_time();
-
+void print_everything(char*,int);
 
 
 

@@ -8,10 +8,11 @@
 #include <iostream>
 #include <string>
 #include "tchar.h"
+using namespace std;
 
 
 class Access {
-public:
+private:
     
     DWORD error_code = GetLastError();
     bool u_Good = 0;
@@ -22,9 +23,11 @@ public:
 
 
 
-//public:
-   bool OpenDevice(string);
-
+public:
+    bool OpenDevice(string);
+    bool Write_on_device(char*,int,int);
+    bool Read_from_device(char*,int,int);
+    bool Close_device();
 
 };
 

@@ -5,6 +5,7 @@
 #include <stdio.h>      /* printf */
 #include <sstream> // stringstream
 #include <iomanip> // put_time
+
 #include "Data.h"
 #include "functions.h"
 #include "Access.h"
@@ -28,63 +29,16 @@ int main()
     char buf[512] = {0};
     char leh[512] = {0};
     bharlo(leh);
-    // DWORD error_code = GetLastError();
-    // bool u_Good = 0;
-    // DWORD status = { 0 };
-    // VOLUME_DISK_EXTENTS hello;
-    string inter="\\\\.\\E:";
-
+    string inter="E:";
     testing.OpenDevice(inter);
+    testing.Write_on_device(leh,0x0000,sizeof(leh));
+    testing.Read_from_device(buf,0x000,sizeof(buf));
+    testing.Close_device();
 
     
-    testing.error_code = SetFilePointer(testing.Disk_101, 0x000, 0, FILE_BEGIN);
-  if (testing.error_code == INVALID_SET_FILE_POINTER)
-    {
-        std::cerr << "Error: failed to seek to the beginning of the disk device" << GetLastError() <<std::endl;
-        CloseHandle(testing.Disk_101);
-        // return 1;
-    }
-    
-    if (!WriteFile(testing.Disk_101, leh, sizeof(leh), &testing.status, NULL))
-    {
-        std::cerr << "Error: failed to write data to disk device" <<  GetLastError() << std::endl;
-        CloseHandle(testing.Disk_101);
-        testing.error_code = GetLastError();
-        return 1;
-    }
-    std::cerr << "Error: failed to write data to disk device" <<  GetLastError() << std::endl;
-
-    std::cout << "Data was successfully written to disk device"<<  GetLastError() << std::endl;
-  
-//      SetFilePointer(hDisk, 0x000, 0, FILE_BEGIN);
-
-testing.error_code = SetFilePointer(testing.Disk_101, 0x000, 0, FILE_BEGIN);
-  if (testing.error_code == INVALID_SET_FILE_POINTER)
-    {
-        std::cerr << "Error: failed to seek to the beginning of the disk device" << std::endl;
-        CloseHandle(testing.Disk_101);
-        return 1;
-    }
-
-    // Read the data back from the disk device
-    char read_buffer[512];
-    DWORD num_bytes_read;
-
-    if (!ReadFile(testing.Disk_101, read_buffer, sizeof(read_buffer), &num_bytes_read, NULL))
-    {
-        testing.error_code = GetLastError();
-        std::cerr << "Failed to read file on USB drive. Error code: " << testing.error_code << std::endl;
-
-        std::cerr << "Error: failed to read data from disk device" << std::endl;
-        CloseHandle(testing.Disk_101);
-        return 1;
-    }
-
-    std::cout << "Data read from disk device: " << read_buffer << std::endl;
-
     // Close the disk device
-    CloseHandle(testing.Disk_101);
 
+    
     return 0;
 }
 
