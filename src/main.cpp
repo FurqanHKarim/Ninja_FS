@@ -32,6 +32,7 @@ int main()
     string inter="E:";
     testing.OpenDevice(inter);
     testing.Write_on_device(leh,0x0000,sizeof(leh));
+    cout << "testing" << endl;
     testing.Read_from_device(buf,0x000,sizeof(buf));
     testing.Close_device();
 
