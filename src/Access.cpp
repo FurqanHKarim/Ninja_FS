@@ -77,10 +77,10 @@ bool Access::OpenDevice(string dev_name) {
 
 }
 
-bool Access:: Write_on_device(char* note,int where,int size){
+bool Access:: Write_on_device(char* note,size_t byte_offset,size_t size){
 
     //////Setting the pointer to where to write the file
-    error_code = SetFilePointer(Disk_101, (where), 0, FILE_BEGIN);
+    error_code = SetFilePointer(Disk_101, (byte_offset), 0, FILE_BEGIN);
     if (error_code == INVALID_SET_FILE_POINTER)
     {
         std::cerr << "Error: failed to seek to the beginning of the disk device" << GetLastError() <<std::endl;
@@ -105,10 +105,10 @@ bool Access:: Write_on_device(char* note,int where,int size){
 }
 
 
-bool Access:: Read_from_device(char* note,int where,int size){
+bool Access:: Read_from_device(char* note,size_t byte_offset,size_t size){
     // Read the data back from the disk device
-
-    error_code = SetFilePointer(Disk_101, where, 0, FILE_BEGIN);
+    //////Setting the pointer to where to start reading the file
+    error_code = SetFilePointer(Disk_101, byte_offset, 0, FILE_BEGIN);
     if (error_code == INVALID_SET_FILE_POINTER)
     {
         std::cerr << "Error: failed to seek to the beginning of the disk device" << std::endl;
@@ -132,7 +132,11 @@ bool Access:: Read_from_device(char* note,int where,int size){
 
 bool Access:: Close_device(){
     // Close the disk device
-    CloseHandle(Disk_101);
-    return 0;
-
+    if(Disk_101 == INVALID_HANDLE_VALUE){
+        cout<<"Disk is not Open:   "<<endl;
+        return 1;
+    }else{
+        CloseHandle(Disk_101);
+        return 0;
+    }
 }

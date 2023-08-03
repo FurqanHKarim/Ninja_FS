@@ -19,14 +19,14 @@ private:
     DWORD status = { 0 };
     VOLUME_DISK_EXTENTS hello;
     string inter = "\\\\.\\E:";
-    HANDLE Disk_101;
+    HANDLE Disk_101 = INVALID_HANDLE_VALUE;
 
 
 
 public:
-    bool OpenDevice(string);
-    bool Write_on_device(char*,int,int);
-    bool Read_from_device(char*,int,int);
+    bool OpenDevice(string dev_name);
+    bool Write_on_device(char* note,size_t byte_offset,size_t size);
+    bool Read_from_device(char* note,size_t byte_offset,size_t size);
     bool Close_device();
 
 };
