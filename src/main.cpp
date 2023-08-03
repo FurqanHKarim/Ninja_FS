@@ -9,6 +9,7 @@
 #include "Data.h"
 #include "functions.h"
 #include "Access.h"
+#include "File_Header.h"
 using namespace std;
 
 
@@ -24,21 +25,20 @@ void bharlo(char* leh) {
 
 int main()
 {
-    Access testing;
-    // Open the disk device
-    char buf[512] = {0};
-    char leh[512] = {0};
-    bharlo(leh);
-    string inter="E:";
-    testing.OpenDevice(inter);
-    testing.Write_on_device(leh,0x0000,sizeof(leh));
-    testing.Read_from_device(buf,0x000,sizeof(buf));
-    testing.Close_device();
-
-    
+    //Access testing;
+    //// Open the disk device
+    //char buf[512] = {0};
+    //char leh[512] = {0};
+    //bharlo(leh);
+    //string inter="E:";
+    //testing.OpenDevice(inter);
+    //testing.Write_on_device(leh,0x0000,sizeof(leh));
+    //testing.Read_from_device(buf,0x000,sizeof(buf));
+    //testing.Close_device();
+    Sysstem n;
+    cout << sizeof(n.Ninja) << endl;
+    cout << sizeof(n);
     // Close the disk device
-
-    
     return 0;
 }
 

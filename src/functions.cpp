@@ -6,7 +6,7 @@
 using namespace std;
 
 
-void print_time(uint64_t a)// take epoch time in time_t as argument and prints out the time and date 
+void print_time(uint64_t a)// take epoch time in time_t as argument and prints out the time and date
 {
 	time_t inter = *(time_t*)&a;
 	inter = inter /10000000;// necessary conversion for struct time to work
